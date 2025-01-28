@@ -30,9 +30,10 @@ jobs:
       - name: Copy artifact for deployment job
         run: |
            mkdir -p deploy
-           cp -r ./.next/standalone/* ./deploy
-           cp -r ./.next/static ./deploy/.next/static
+           cp -r ./.next/standalone/. ./deploy
            cp -r ./public ./deploy
+           cp -r ./.next/static/. ./deploy/.next/static
+           
 
       # ビルド後に.next/staticが存在するか確認するステップを追加
       # .next/staticが生成されない場合は、GitHub Actionsでエラーにならないように追加
