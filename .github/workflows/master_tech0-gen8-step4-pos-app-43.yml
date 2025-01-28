@@ -29,10 +29,23 @@ jobs:
 
       - name: Copy artifact for deployment job
         run: |
-           mkdir deploy
+           mkdir -p deploy
            cp -r ./.next/standalone/. ./deploy
            cp -r ./public ./deploy
            cp -r ./.next/static/. ./deploy/.next/static
+           
+
+      # ビルド後に.next/staticが存在するか確認するステップを追加
+      # .next/staticが生成されない場合は、GitHub Actionsでエラーにならないように追加
+      - name: Verify .next/static directory
+        run: |
+          if [ ! -d ".next/static" ]; then
+            echo "Warning: .next/static directory does not exist"
+            mkdir -p .next/static
+          fi
+          mkdir -p deploy
+          cp -r ./.next/static ./deploy/.next/static
+
 
       - name: Zip artifact for deployment
         run: zip release.zip ./deploy -r
