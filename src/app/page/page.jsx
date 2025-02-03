@@ -14,7 +14,10 @@ const Page = () => {
     // 商品コード読み込みボタン
     const fetchProductInfo = async () =>{
         try {
-            setError(null);//エラーリセット
+            setError("");//エラーリセット
+            if (!code.trim()){
+                throw new Error("商品コードを入力してください");
+            }
             const response = await fetch(`${apiUrl}/products/${code}`,{
                 method: "GET",
                 headers: {
@@ -28,8 +31,12 @@ const Page = () => {
             const data = await response.json();// バックエンドからのレスポンスを取得
             setProductName(data.name);//商品名セット
             setProductPrice(data.price);//単価セット
-        }catch (err) {
-            setError(err.message);//エラーメッセージセット
+        } catch (err) {
+            if (err instanceof Error) {
+                setError(err.message);//エラーメッセージセット
+            }else {
+                setError("予期しないエラーが発生しました");
+            }
         }
     };
 
