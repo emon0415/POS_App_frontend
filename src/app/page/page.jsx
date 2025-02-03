@@ -4,9 +4,9 @@ import React, { useState } from "react";
 
 const Page = () => {
     const [code, setCode] = useState("");//商品コード
-    const [error, setError] = useState<string | null>(null);//エラーメッセージ
+    const [error, setError] = useState(null);//エラーメッセージ
     const [productName, setProductName] = useState("");//商品名
-    const [productPrice, setProductPrice] = useState<number | null>(null);//単価
+    const [productPrice, setProductPrice] = useState(null);//単価
 
     const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
