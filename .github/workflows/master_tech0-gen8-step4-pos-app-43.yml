@@ -27,6 +27,14 @@ jobs:
           npm run build --if-present
           npm run test --if-present
 
+      # クライアントサイドで使用する環境変数を読み込む
+      - name: Build project
+        env:
+          NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL }}
+        run: |
+          echo "NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}"
+          npm run build
+
       - name: Copy artifact for deployment job
         run: |
            mkdir -p deploy
