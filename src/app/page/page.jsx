@@ -48,17 +48,16 @@ const Page = () => {
                 type="text" 
                 value={code} 
                 onChange={(e) => setCode(e.target.value)} 
-                placeholder="Enter product code"
+                placeholder="商品コードを入力してください"
             />
             <button onClick={fetchProductInfo}>
-                Fetch Product Code
+                商品コード読み込み
             </button>
             {error && <p style = {{color: "red" }}>{error}</p>}
             {productName && (
                 <div>
-                    <h2>Product Information</h2>
-                    <h2>Name: {productName}</h2>
-                    <p>Price: {productPrice !== null ? `${productPrice}円` : "N/A"}</p>
+                    <h2>名前: {productName}</h2>
+                    <p>値段: {productPrice !== null ? `${productPrice}円` : "N/A"}</p>
                 </div>
             )}
         </div>
