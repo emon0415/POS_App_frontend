@@ -51,28 +51,96 @@ const Page = () => {
 
 
     return (
-        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "20px" }}>
-            <div style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: "10px" }}>
+        <div 
+            style={{ 
+                backgroundColor: "#f2f2f2",
+                minHeight: "100vh",
+                padding: "20px",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                gap: "20px" 
+                }}
+        >
+            <div 
+                style={{ 
+                    display: "flex",
+                    flexDirection: "row",
+                    alignItems: "center",
+                    gap: "10px" ,
+                    border: "1px solid #ddd",
+                    padding: "10px",
+                    borderRadius: "5px"
+                    }}
+            >
                 <input 
                     type="text" 
                     value={code} 
                     onChange={(e) => setCode(e.target.value)} 
                     placeholder="商品コードを入力してください"
-                    style={{ padding: "10px", fontSize: "16px" }}
+                    style={{ 
+                        padding: "10px",
+                        fontSize: "16px" ,
+                        width: "200px",
+                        border: "1px solid #ccc", 
+                        borderRadius: "5px", 
+                        color: "#000", 
+                        backgroundColor: "#fff"
+                    }}
                 />
-                <button onClick={fetchProductInfo} style={{ padding: "10px 20px", fontSize: "16px" }}>
+                <button 
+                    onClick={fetchProductInfo} 
+                    style={{ 
+                        padding: "10px 20px", 
+                        fontSize: "16px", 
+                        backgroundColor: "#007BFF", 
+                        color: "white", 
+                        border: "none", 
+                        borderRadius: "5px", 
+                        cursor: "pointer" 
+                        }}
+                >
                     商品コード読み込み
                 </button>
-            </div>            
+            </div>
             {error && <p style = {{color: "red" }}>{error}</p>}
             {productName && (
-                <div style={{ textAlign: "center" }}>
+                <div 
+                    style={{ 
+                        textAlign: "center" , 
+                        border: "1px solid #ddd", 
+                        padding: "10px", 
+                        borderRadius: "5px", 
+                        width: "300px", 
+                        backgroundColor: "#fff" 
+                        }}
+                >
                     <h2>名前: {productName}</h2>
                     <p>値段: {productPrice !== null ? `${productPrice}円` : "N/A"}</p>
-                    <button onClick={addToCart} style={{ padding: "10px 20px", fontSize: "16px" }}>追加</button>
+                    <button onClick={addToCart} 
+                        className="animate-rainbow"
+                        style={{ 
+                            padding: "10px 20px",
+                            fontSize: "16px",
+                            color: "white",
+                            border: "none",
+                            borderRadius: "5px",
+                            cursor: "pointer", 
+                            }}
+                    >
+                        追加
+                    </button>
                 </div>
             )}
-            <div style={{ width: "400px", border: "1px solid #ddd", padding: "10px" }}>
+            <div 
+                style={{ 
+                    width: "400px", 
+                    border: "1px solid #ddd", 
+                    padding: "10px", 
+                    borderRadius: "5px", 
+                    backgroundColor: "#fff" 
+                    }}
+            >
                 <h2>購入リスト</h2>
                 <ul>
                     {cart.map((item, index) => (
@@ -82,7 +150,17 @@ const Page = () => {
                         </li>
                     ))}
                 </ul>
-                <button style={{ marginTop: "10px", padding: "10px 20px", fontSize: "16px" }}>購入</button>
+                <button 
+                    className="animate-blink" 
+                    style={{ 
+                        marginTop: "10px", 
+                        padding: "10px 20px", 
+                        fontSize: "16px", 
+                        cursor: "pointer" 
+                        }}
+                >
+                    購入
+                </button>
             </div>
         </div>
     );
