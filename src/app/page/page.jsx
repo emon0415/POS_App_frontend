@@ -7,6 +7,7 @@ const Page = () => {
     const [error, setError] = useState(null);//エラーメッセージ
     const [productName, setProductName] = useState("");//商品名
     const [productPrice, setProductPrice] = useState(null);//単価
+    const [cart, setCart] = useState([]);// 購入リスト
 
     const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
@@ -40,26 +41,49 @@ const Page = () => {
         }
     };
 
+    const addToCart = () => {
+        if (productName && productPrice) {
+            setCart([...cart, {name: productName, price: productPrice}]);
+            setProductName("");
+            setProductPrice(null);
+        }
+    };
+
 
     return (
-        <div>
-            <h1>Product Code Input</h1>
-            <input 
-                type="text" 
-                value={code} 
-                onChange={(e) => setCode(e.target.value)} 
-                placeholder="商品コードを入力してください"
-            />
-            <button onClick={fetchProductInfo}>
-                商品コード読み込み
-            </button>
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "20px" }}>
+            <div style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: "10px" }}>
+                <input 
+                    type="text" 
+                    value={code} 
+                    onChange={(e) => setCode(e.target.value)} 
+                    placeholder="商品コードを入力してください"
+                    style={{ padding: "10px", fontSize: "16px" }}
+                />
+                <button onClick={fetchProductInfo} style={{ padding: "10px 20px", fontSize: "16px" }}>
+                    商品コード読み込み
+                </button>
+            </div>            
             {error && <p style = {{color: "red" }}>{error}</p>}
             {productName && (
-                <div>
+                <div style={{ textAlign: "center" }}>
                     <h2>名前: {productName}</h2>
                     <p>値段: {productPrice !== null ? `${productPrice}円` : "N/A"}</p>
+                    <button onClick={addToCart} style={{ padding: "10px 20px", fontSize: "16px" }}>追加</button>
                 </div>
             )}
+            <div style={{ width: "400px", border: "1px solid #ddd", padding: "10px" }}>
+                <h2>購入リスト</h2>
+                <ul>
+                    {cart.map((item, index) => (
+                        <li key={index} style={{ display: "flex", justifyContent: "space-between" }}>
+                            <span>{item.name}</span>
+                            <span>{item.price}円</span>
+                        </li>
+                    ))}
+                </ul>
+                <button style={{ marginTop: "10px", padding: "10px 20px", fontSize: "16px" }}>購入</button>
+            </div>
         </div>
     );
 };
