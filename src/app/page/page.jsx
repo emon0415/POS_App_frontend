@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 
 const Page = () => {
@@ -8,9 +8,14 @@ const Page = () => {
     const [productName, setProductName] = useState("");//商品名
     const [productPrice, setProductPrice] = useState(null);//単価
     const [cart, setCart] = useState([]);// 購入リスト
+    const [totalPrice, setTotalPrice] = useState(0);//合計金額]
 
     const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
+    useEffect(() => {
+        // cartが更新されるたびに合計金額を計算
+        setTotalPrice(cart.reduce((acc,item) => acc + parseInt(item.price, 10), 0));
+    }, [cart]);
 
     // 商品コード読み込みボタン
     const fetchProductInfo = async () =>{
@@ -30,8 +35,8 @@ const Page = () => {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
             const data = await response.json();// バックエンドからのレスポンスを取得
-            setProductName(data.name);//商品名セット
-            setProductPrice(data.price);//単価セット
+            setProductName(data.name || "");//商品名セット
+            setProductPrice(data.price || "");//単価セット
         } catch (err) {
             if (err instanceof Error) {
                 setError(err.message);//エラーメッセージセット
@@ -44,9 +49,24 @@ const Page = () => {
     const addToCart = () => {
         if (productName && productPrice) {
             setCart([...cart, {name: productName, price: productPrice}]);
+            setTotalPrice(cart.reduce((acc, item) => acc + item.price, 0));
             setProductName("");
             setProductPrice(null);
         }
+    };
+
+    const clearCart = () => {
+        setCart([]);
+        setTotalPrice(0);
+    }
+
+    const handlePurchase = () => {
+        if (cart.length == 0) {
+            alert("購入リストがありません");
+            return;
+        }
+        alert(`合計金額: ${totalPrice}円`);
+        clearCart();
     };
 
 
@@ -104,34 +124,36 @@ const Page = () => {
                 </button>
             </div>
             {error && <p style = {{color: "red" }}>{error}</p>}
-            {productName && (
-                <div 
+
+            <div 
+                style={{ 
+                    textAlign: "center" , 
+                    border: "1px solid #ddd", 
+                    padding: "10px", 
+                    borderRadius: "5px", 
+                    width: "300px", 
+                    backgroundColor: "#fff" 
+                    }}
+            >
+                <h2> {productName || ""}</h2>
+                <p> {productPrice !== null ? `${productPrice}円` : ""}</p>
+                <button 
+                    onClick={addToCart} 
+                    className="animate-rainbow"
                     style={{ 
-                        textAlign: "center" , 
-                        border: "1px solid #ddd", 
-                        padding: "10px", 
-                        borderRadius: "5px", 
-                        width: "300px", 
-                        backgroundColor: "#fff" 
+                        padding: "10px 20px",
+                        fontSize: "16px",
+                        color: "white",
+                        backgroundColor: "#28A745",
+                        border: "none",
+                        borderRadius: "5px",
+                        cursor: "pointer", 
                         }}
                 >
-                    <h2>名前: {productName}</h2>
-                    <p>値段: {productPrice !== null ? `${productPrice}円` : "N/A"}</p>
-                    <button onClick={addToCart} 
-                        className="animate-rainbow"
-                        style={{ 
-                            padding: "10px 20px",
-                            fontSize: "16px",
-                            color: "white",
-                            border: "none",
-                            borderRadius: "5px",
-                            cursor: "pointer", 
-                            }}
-                    >
-                        追加
-                    </button>
-                </div>
-            )}
+                    追加
+                </button>
+            </div>
+            
             <div 
                 style={{ 
                     width: "400px", 
@@ -150,16 +172,38 @@ const Page = () => {
                         </li>
                     ))}
                 </ul>
+                <p style={{ fontWeight: "bold" }}>合計金額: {totalPrice}円</p>
                 <button 
+                    onClick={handlePurchase}
                     className="animate-blink" 
                     style={{ 
                         marginTop: "10px", 
                         padding: "10px 20px", 
                         fontSize: "16px", 
-                        cursor: "pointer" 
+                        cursor: "pointer", 
+                        backgroundColor: "#FF5722",
+                        color: "white", 
+                        border: "none", 
+                        borderRadius: "5px" 
                         }}
                 >
                     購入
+                </button>
+                <button
+                    onClick={clearCart}
+                    style={{
+                        marginTop: "10px", 
+                        padding: "10px 20px", 
+                        fontSize: "16px", 
+                        cursor: "pointer", 
+                        backgroundColor: "#FF0000",
+                        color: "white", 
+                        border: "none", 
+                        borderRadius: "5px" 
+    
+                    }}
+                >
+                    リセット
                 </button>
             </div>
         </div>
