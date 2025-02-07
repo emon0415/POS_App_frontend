@@ -48,3 +48,60 @@ body {
   border: none;
   font-weight: bold;
 }
+
+/* 背景全体に虹色アニメーションを適用 */
+@keyframes psychedelic-rainbow {
+  0% { background-color: #ff0000; } /* 赤 */
+  16.7% { background-color: #ff7f00; } /* オレンジ */
+  33.3% { background-color: #ffff00; } /* 黄色 */
+  50% { background-color: #00ff00; } /* 緑 */
+  66.7% { background-color: #0000ff; } /* 青 */
+  83.3% { background-color: #4b0082; } /* 藍 */
+  100% { background-color: #9400d3; } /* 紫 */
+}
+
+.animate-psychedelic {
+  animation: psychedelic-rainbow 3s linear infinite; /* 3秒で全色を循環 */
+  background-size: cover;
+  background-blend-mode: lighten;
+}
+
+/* 平成初期をイメージした雰囲気を再現するテキストスタイル */
+.psychedelic-text {
+  font-family: "Comic Sans MS", cursive, sans-serif;
+  color: #fff;
+  text-shadow: 2px 2px 0px #000, 4px 4px 0px #fff, 6px 6px 0px #000;
+  animation: text-glitch 1s infinite alternate;
+}
+
+/* テキストがチカチカするアニメーション */
+@keyframes text-glitch {
+  0% { text-shadow: 2px 2px 0px #ff00ff; }
+  50% { text-shadow: 4px 4px 0px #00ffff; }
+  100% { text-shadow: 6px 6px 0px #ffff00; }
+}
+
+/* サイケデリックアニメーション (タイトル専用) */
+@keyframes psychedelic-title {
+  0% { color: #ff0000; text-shadow: 2px 2px #000; }
+  25% { color: #00ff00; text-shadow: 4px 4px #fff; }
+  50% { color: #0000ff; text-shadow: 6px 6px #000; }
+  75% { color: #ffff00; text-shadow: 8px 8px #fff; }
+  100% { color: #ff00ff; text-shadow: 10px 10px #000; }
+}
+
+/* サイケデリックタイトル用クラス */
+.psychedelic-title {
+  font-family: "Comic Sans MS", cursive, sans-serif;
+  font-weight: bold;
+  animation: psychedelic-title 2s infinite alternate;
+  text-align: center;
+  margin-bottom: 20px;
+  display: block;
+
+  /* 画面幅に応じた文字サイズ */
+  font-size: calc(5vw + 20px); /* vwは画面幅に基づくサイズ */
+  white-space: nowrap; /* 改行を防止 */
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

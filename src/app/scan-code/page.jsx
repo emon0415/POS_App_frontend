@@ -1,8 +1,8 @@
 "use client";
 import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 
-
-const Page = () => {
+const ScanCode = () => {
     const [code, setCode] = useState("");//商品コード
     const [error, setError] = useState(null);//エラーメッセージ
     const [productName, setProductName] = useState("");//商品名
@@ -11,6 +11,7 @@ const Page = () => {
     const [totalPrice, setTotalPrice] = useState(0);//合計金額]
 
     const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+    const router = useRouter();
 
     useEffect(() => {
         // cartが更新されるたびに合計金額を計算
@@ -67,6 +68,11 @@ const Page = () => {
         }
         alert(`合計金額: ${totalPrice}円`);
         clearCart();
+    };
+
+    const handleGoBack = () => {
+        // new-transaction ページに戻る
+        router.push("/new-transaction");
     };
 
 
@@ -206,8 +212,23 @@ const Page = () => {
                     リセット
                 </button>
             </div>
+            <button
+                onClick={handleGoBack}
+                style={{
+                    marginTop: "20px",
+                    padding: "10px 20px",
+                    fontSize: "16px",
+                    backgroundColor: "#6C757D",
+                    color: "white",
+                    border: "none",
+                    borderRadius: "5px",
+                    cursor: "pointer",
+                }}
+            >
+                TOP画面に戻る
+            </button>
         </div>
     );
 };
 
-export default Page;
+export default ScanCode;
