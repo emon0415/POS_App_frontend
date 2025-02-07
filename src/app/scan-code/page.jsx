@@ -102,9 +102,9 @@ const ScanCode = () => {
         >
             <div>
                 <h2 style={{ margin: 0, color: "#333" }}>新規取引情報</h2>
-                <p>レジ担当者コード (EMP_CD): {empCd}</p>
-                <p>店舗コード (STORE_CD): {storeCd}</p>
-                <p>POS機ID (POS_NO): {posNo}</p>
+                <p>レジ担当者コード: {empCd}</p>
+                <p>店舗コード: {storeCd}</p>
+                <p>POS機ID: {posNo}</p>
             </div>
 
             <div 
