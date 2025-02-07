@@ -13,6 +13,18 @@ const ScanCode = () => {
     const apiUrl = process.env.NEXT_PUBLIC_API_URL;
     const router = useRouter();
 
+    // クエリパラメータから取得
+    const [empCd, setEmpCd] = useState("");
+    const [storeCd, setStoreCd] = useState("");
+    const [posNo, setPosNo] = useState("");
+
+    useEffect(() => {
+        const queryParams = new URLSearchParams(window.location.search);
+        setEmpCd(queryParams.get("empCd") || "");
+        setStoreCd(queryParams.get("storeCd") || "");
+        setPosNo(queryParams.get("posNo") || "");
+    }, []);
+
     useEffect(() => {
         // cartが更新されるたびに合計金額を計算
         setTotalPrice(cart.reduce((acc,item) => acc + parseInt(item.price, 10), 0));
@@ -88,6 +100,13 @@ const ScanCode = () => {
                 gap: "20px" 
                 }}
         >
+            <div>
+                <h2 style={{ margin: 0, color: "#333" }}>新規取引情報</h2>
+                <p>レジ担当者コード (EMP_CD): {empCd}</p>
+                <p>店舗コード (STORE_CD): {storeCd}</p>
+                <p>POS機ID (POS_NO): {posNo}</p>
+            </div>
+
             <div 
                 style={{ 
                     display: "flex",
