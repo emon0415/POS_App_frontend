@@ -14,6 +14,18 @@ const NewTransactionPage = () => {
             alert("全ての項目を入力してください");
             return;
         }
+        if (empCd.length !== 10 || isNaN(empCd)) {
+            alert("レジ担当者コードは10桁の数字を入力してください");
+            return;
+        }
+        if (storeCd.length !== 2 || isNaN(storeCd)) {
+            alert("店舗コードは2桁の数字を入力してください");
+            return;
+        }
+        if (posNo.length !== 2 || isNaN(posNo)) {
+            alert("POS機IDは2桁の数字を入力してください");
+            return;
+        }
 
         // コード読み取りページに移動 (例として仮のURL)
         router.push(`/scan-code?empCd=${empCd}&storeCd=${storeCd}&posNo=${posNo}`);

@@ -73,20 +73,43 @@ const ScanCode = () => {
         setTotalPrice(0);
     }
 
-    const handlePurchase = () => {
+    const handlePurchase = async () => {
         if (cart.length == 0) {
             alert("購入リストがありません");
             return;
         }
-        alert(`合計金額: ${totalPrice}円`);
-        clearCart();
+
+        try {
+            const response = await fetch(`${apiUrl}/add_transaction`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    emp_cd: empCd,
+                    store_cd: storeCd,
+                    pos_no: posNo,
+                    total_amt: totalPrice,
+                }),
+            });
+
+            if(!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            alert(`取引登録が登録されました。取引ID: ${data.TRD_ID}`);
+            clearCart();
+        } catch (err) {
+            console.error(err);
+            alert("取引登録中にエラーが発生しました");
+        }
     };
 
     const handleGoBack = () => {
         // new-transaction ページに戻る
         router.push("/new-transaction");
     };
-
 
     return (
         <div 
