@@ -48,8 +48,8 @@ const ScanCode = () => {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
             const data = await response.json();// バックエンドからのレスポンスを取得
-            setProductName(data.name || "");//商品名セット
-            setProductPrice(data.price || "");//単価セット
+            setProductName(data.NAME || "");//商品名セット
+            setProductPrice(data.PRICE || "");//単価セット
         } catch (err) {
             if (err instanceof Error) {
                 setError(err.message);//エラーメッセージセット
@@ -62,7 +62,6 @@ const ScanCode = () => {
     const addToCart = () => {
         if (productName && productPrice) {
             setCart([...cart, {name: productName, price: productPrice}]);
-            setTotalPrice(cart.reduce((acc, item) => acc + item.price, 0));
             setProductName("");
             setProductPrice(null);
         }
@@ -86,10 +85,10 @@ const ScanCode = () => {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
-                    emp_cd: empCd,
-                    store_cd: storeCd,
-                    pos_no: posNo,
-                    total_amt: totalPrice,
+                    EMP_CD: empCd,
+                    STORE_CD: storeCd,
+                    POS_NO: posNo,
+                    TOTAL_AMT: totalPrice,
                 }),
             });
 
@@ -102,7 +101,7 @@ const ScanCode = () => {
             clearCart();
         } catch (err) {
             console.error(err);
-            alert("取引登録中にエラーが発生しました");
+            alert(`取引登録中にエラーが発生しました: ${err.message}`);
         }
     };
 
