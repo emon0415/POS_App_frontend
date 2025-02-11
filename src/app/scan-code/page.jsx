@@ -13,7 +13,7 @@ const ScanCode = () => {
     const apiUrl = process.env.NEXT_PUBLIC_API_URL;
     const router = useRouter();
 
-    // クエリパラメータから取得
+    // TOPページで入力した情報をクエリパラメータから取得
     const [empCd, setEmpCd] = useState("");
     const [storeCd, setStoreCd] = useState("");
     const [posNo, setPosNo] = useState("");
@@ -77,6 +77,7 @@ const ScanCode = () => {
             alert("購入リストがありません");
             return;
         }
+
 
         try {
             const response = await fetch(`${apiUrl}/add_transaction`, {
