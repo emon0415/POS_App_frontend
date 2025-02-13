@@ -93,12 +93,35 @@ const ScanCode = () => {
                 }),
             });
 
-            if(!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+            if(!transactionResponse.ok) {
+                throw new Error(`HTTP error! status: ${transactionResponse.status}`);
             }
 
-            const data = await response.json();
-            alert(`取引登録が登録されました。取引ID: ${data.TRD_ID}`);
+            const transactionData = await transactionResponse.json();
+            const trdId = transactionData.TRD_ID;
+            alert(`取引登録が登録されました。取引ID: ${trdId}`);
+
+            // 取引詳細を登録
+            const detailResponse = await fetch(`${apiUrl}/add_transaction_detail`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(
+                    cart.map(item => ({
+                        TRD_ID: trdId,
+                        PRD_ID: item.PRD_ID, // 商品IDを取得
+                        PRD_CODE: item.PRD_CODE,
+                        PRD_NAME: item.name,
+                        PRD_PRICE: item.price,
+                    }))
+                ),
+            });
+
+            if (!detailResponse.ok) {
+                throw new Error(`HTTP error! status: ${detailResponse.status}`);
+            }
+
+            alert("取引詳細が登録されました");
+
             clearCart();
         } catch (err) {
             console.error(err);
