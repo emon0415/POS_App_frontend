@@ -93,11 +93,11 @@ const ScanCode = () => {
                 }),
             });
 
-            if(!transactionResponse.ok) {
-                throw new Error(`HTTP error! status: ${transactionResponse.status}`);
+            if(!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
             }
 
-            const transactionData = await transactionResponse.json();
+            const transactionData = await response.json();
             const trdId = transactionData.TRD_ID;
             alert(`取引登録が登録されました。取引ID: ${trdId}`);
 
