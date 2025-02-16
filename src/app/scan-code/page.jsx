@@ -85,6 +85,12 @@ const ScanCode = () => {
     const fetchTransactionDetails = async (trdId) => {
         try{
             for (const item of cart){
+                // MISSING のデータは送信しない
+                if (!item.PRD_CODE || item.PRD_CODE === "MISSING") {
+                    console.warn("スキップ: 不正な商品コード", item);
+                    continue;
+                }
+
                 const requestData = {
                     TRD_ID: trdId,
                     PRD_CODE: item.PRD_CODE || "MISSING",
@@ -141,7 +147,7 @@ const ScanCode = () => {
     // 商品コード読み込みボタン
     const fetchProductInfo = async () =>{
         try {
-            setError("");//エラーリセット
+            setError("null");//エラーリセット
             if (!code.trim()){
                 throw new Error("商品コードを入力してください");
             }
@@ -159,11 +165,9 @@ const ScanCode = () => {
             setProductName(data.NAME || "");//商品名セット
             setProductPrice(data.PRICE || "");//単価セット
         } catch (err) {
-            if (err instanceof Error) {
-                setError(err.message);//エラーメッセージセット
-            }else {
-                setError("予期しないエラーが発生しました");
-            }
+            setError(err.message);
+            setProductName(""); // 商品情報リセット
+            setProductPrice(null);
         }
     };
 
