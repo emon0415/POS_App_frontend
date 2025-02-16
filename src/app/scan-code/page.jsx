@@ -26,7 +26,7 @@ const ScanCode = () => {
     }, []);
 
     useEffect(() => {
-        // cartが更新されるたびに合計金額を計算
+        // cartが更新されるたびに合計金額を計算する
         setTotalPrice(cart.reduce((acc,item) => acc + parseInt(item.price, 10), 0));
     }, [cart]);
 
@@ -152,6 +152,7 @@ const ScanCode = () => {
         }
     };
 
+    // カートに追加。setCartにはバックエンドに送る内容をいれておきました。。。
     const addToCart = () => {
         if (productName && productPrice) {
             setCart([...cart, {PRD_CODE: code, name: productName, price: productPrice}]);
