@@ -30,6 +30,99 @@ const ScanCode = () => {
         setTotalPrice(cart.reduce((acc,item) => acc + parseInt(item.price, 10), 0));
     }, [cart]);
 
+    // APIリクエストのエラーハンドリングを統一
+    const handleErrors = async (response) => {
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
+        }
+        return response.json();
+    };
+
+    // 取引を登録する関数
+    const fetchTransaction = async (totalPrice) => {
+        try{
+            console.log("取引登録リクエスト開始"); // デバッグログ
+            const response = await fetch(`${apiUrl}/add_transaction`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    EMP_CD: empCd,
+                    STORE_CD: storeCd,
+                    POS_NO: posNo,
+                    TOTAL_AMT: totalPrice,
+                }),
+            });
+
+            console.log("取引登録レスポンス:", response); // レスポンス全体をログ
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
+            }
+
+            const transactionData = await response.json();
+            console.log("取引登録レスポンスデータ:", transactionData); // JSONレスポンスをログ
+
+            if (!transactionData.TRD_ID) {
+                throw new Error("取引登録に失敗しました。サーバーからの適切なレスポンスがありません。");
+            }
+
+            return transactionData.TRD_ID;
+        } catch (error) {
+            console.error("取引登録エラー:", error);
+            throw error;
+        }
+    };
+
+    // 取引詳細を登録する関数
+    const fetchTransactionDetails = async (trdId) => {
+        try{
+            for (const item of cart){
+                const requestData = {
+                    TRD_ID: trdId,
+                    PRD_CODE: item.PRD_CODE || "MISSING",
+                    PRD_NAME: item.name || "MISSING",
+                    PRD_PRICE: item.price || 0,
+                };
+                console.log("送信データ:", requestData);
+
+                const response = await fetch(`${apiUrl}/add_transaction_detail`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(requestData),
+                });
+                await handleErrors(response);
+            }
+
+            alert("取引詳細が登録されました");
+        } catch (err) {
+            console.error("取引詳細登録エラー:", err);
+            alert(`取引詳細登録中にエラーが発生しました: ${err.message}`);
+        }
+    };
+
+    // メインの購入処理
+    const handlePurchase = async () => {
+        if (cart.length === 0) {
+            alert("購入リストがありません");
+            return;
+        }
+
+        try {
+            const trdId = await fetchTransaction(totalPrice);
+            alert(`取引登録が完了しました。取引ID: ${trdId}`);
+
+            await fetchTransactionDetails(trdId);
+            alert("取引詳細が登録されました");
+
+            clearCart();
+        } catch (err) {
+            console.error(err);
+            alert(`取引登録中にエラーが発生しました: ${err.message}`);
+        }
+    };
+
     // 商品コード読み込みボタン
     const fetchProductInfo = async () =>{
         try {
@@ -61,7 +154,7 @@ const ScanCode = () => {
 
     const addToCart = () => {
         if (productName && productPrice) {
-            setCart([...cart, {name: productName, price: productPrice}]);
+            setCart([...cart, {PRD_CODE: code, name: productName, price: productPrice}]);
             setProductName("");
             setProductPrice(null);
         }
@@ -72,62 +165,6 @@ const ScanCode = () => {
         setTotalPrice(0);
     }
 
-    const handlePurchase = async () => {
-        if (cart.length == 0) {
-            alert("購入リストがありません");
-            return;
-        }
-
-
-        try {
-            const response = await fetch(`${apiUrl}/add_transaction`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    EMP_CD: empCd,
-                    STORE_CD: storeCd,
-                    POS_NO: posNo,
-                    TOTAL_AMT: totalPrice,
-                }),
-            });
-
-            if(!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-
-            const transactionData = await response.json();
-            const trdId = transactionData.TRD_ID;
-            alert(`取引登録が登録されました。取引ID: ${trdId}`);
-
-            // 取引詳細を登録
-            const detailResponse = await fetch(`${apiUrl}/add_transaction_detail`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(
-                    cart.map(item => ({
-                        TRD_ID: trdId,
-                        PRD_ID: item.PRD_ID, // 商品IDを取得
-                        PRD_CODE: item.PRD_CODE,
-                        PRD_NAME: item.name,
-                        PRD_PRICE: item.price,
-                    }))
-                ),
-            });
-
-            if (!detailResponse.ok) {
-                throw new Error(`HTTP error! status: ${detailResponse.status}`);
-            }
-
-            alert("取引詳細が登録されました");
-
-            clearCart();
-        } catch (err) {
-            console.error(err);
-            alert(`取引登録中にエラーが発生しました: ${err.message}`);
-        }
-    };
 
     const handleGoBack = () => {
         // new-transaction ページに戻る
@@ -210,7 +247,6 @@ const ScanCode = () => {
                 <p> {productPrice !== null ? `${productPrice}円` : ""}</p>
                 <button 
                     onClick={addToCart} 
-                    className="animate-rainbow"
                     style={{ 
                         padding: "10px 20px",
                         fontSize: "16px",
@@ -246,7 +282,6 @@ const ScanCode = () => {
                 <p style={{ fontWeight: "bold" }}>合計金額: {totalPrice}円</p>
                 <button 
                     onClick={handlePurchase}
-                    className="animate-blink" 
                     style={{ 
                         marginTop: "10px", 
                         padding: "10px 20px", 
