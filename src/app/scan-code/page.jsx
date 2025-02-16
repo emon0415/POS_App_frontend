@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Quagga from 'quagga';
 
 const ScanCode = () => {
     const [code, setCode] = useState("");//商品コード
@@ -9,11 +10,12 @@ const ScanCode = () => {
     const [productPrice, setProductPrice] = useState(null);//単価
     const [cart, setCart] = useState([]);// 購入リスト
     const [totalPrice, setTotalPrice] = useState(0);//合計金額]
+    const [isScanning, setIsScanning] = useState(false); // スキャン状態の管理
 
     const apiUrl = process.env.NEXT_PUBLIC_API_URL;
     const router = useRouter();
 
-    // TOPページで入力した情報をクエリパラメータから取得
+    // TOPページで入力した情報をURLに記載されているクエリパラメータから取得
     const [empCd, setEmpCd] = useState("");
     const [storeCd, setStoreCd] = useState("");
     const [posNo, setPosNo] = useState("");
@@ -127,6 +129,15 @@ const ScanCode = () => {
         }
     };
 
+    // 🔹 商品コード変更時に自動で商品情報を取得
+    useEffect(() => {
+        if (code.trim()) {
+            fetchProductInfo();
+        }
+    }, [code]); // codeが変更されたらfetchProductInfoを実行
+
+    
+
     // 商品コード読み込みボタン
     const fetchProductInfo = async () =>{
         try {
@@ -156,6 +167,13 @@ const ScanCode = () => {
         }
     };
 
+    // 🔹 商品情報を削除する関数
+    const clearProductInfo = () => {
+        setCode("");
+        setProductName("");
+        setProductPrice(null);
+    };
+
     // カートに追加。setCartにはバックエンドに送る内容をいれておきました。。。
     const addToCart = () => {
         if (productName && productPrice) {
@@ -176,6 +194,59 @@ const ScanCode = () => {
         router.push("/new-transaction");
     };
 
+    // 🔹 商品情報がない場合はカメラを起動し、商品情報がある場合はカメラを停止
+    useEffect(() => {
+        if (!productName) {
+            startScanning();
+        } else {
+            stopScanning();
+        }
+    }, [productName]);
+
+    // QuaggaJSの初期化と設定
+    const startScanning = () => {
+        if (isScanning) return; // すでにスキャン中なら何もしない
+
+        Quagga.init({
+            inputStream : {
+                name : "Live",
+                type : "LiveStream",
+                target: document.querySelector('#scanner-container'),    // スキャン表示先
+                constraints: {
+                    width: 640,
+                    height: 480,
+                    facingMode: "environment" // 背面カメラを使用
+                }
+            },
+            decoder : {
+              readers : ["ean_reader"]  // 今回は"ean_reader"のみ
+            }
+        }, (err) => {
+            if (err) {
+                console.log(err);
+                return
+            }
+            console.log("Initialization finished. Ready to start");
+            //setScanning(true); // 初期化後に自動でスキャンを開始する場合はコメントを外す
+            Quagga.start();
+            setIsScanning(true);
+        });
+
+        // 🔹 バーコードを検出したときの処理
+        Quagga.onDetected((result) => {
+            setCode(result.codeResult.code); // 読み取ったバーコードをstateにセット
+        });
+    };
+
+    // Quaggaの停止
+    const stopScanning = () => {
+        if (!isScanning) return; // すでに停止中なら何もしない
+        Quagga.stop();
+        setIsScanning(false);
+    };
+
+
+
     return (
         <div 
             style={{ 
@@ -195,47 +266,9 @@ const ScanCode = () => {
                 <p>POS機ID: {posNo}</p>
             </div>
 
-            <div 
-                style={{ 
-                    display: "flex",
-                    flexDirection: "row",
-                    alignItems: "center",
-                    gap: "10px" ,
-                    border: "1px solid #ddd",
-                    padding: "10px",
-                    borderRadius: "5px"
-                    }}
-            >
-                <input 
-                    type="text" 
-                    value={code} 
-                    onChange={(e) => setCode(e.target.value)} 
-                    placeholder="商品コードを入力してください"
-                    style={{ 
-                        padding: "10px",
-                        fontSize: "16px" ,
-                        width: "200px",
-                        border: "1px solid #ccc", 
-                        borderRadius: "5px", 
-                        color: "#000", 
-                        backgroundColor: "#fff"
-                    }}
-                />
-                <button 
-                    onClick={fetchProductInfo} 
-                    style={{ 
-                        padding: "10px 20px", 
-                        fontSize: "16px", 
-                        backgroundColor: "#007BFF", 
-                        color: "white", 
-                        border: "none", 
-                        borderRadius: "5px", 
-                        cursor: "pointer" 
-                        }}
-                >
-                    商品コード読み込み
-                </button>
-            </div>
+            {/* 読み取ったバーコードを表示 */}
+            <div id="scanner-container" style={{ width: '640px', height: '480px', border: "2px solid black" }}></div>
+            <p>読み取ったバーコード: {code}</p>
             {error && <p style = {{color: "red" }}>{error}</p>}
 
             <div 
@@ -263,6 +296,17 @@ const ScanCode = () => {
                         }}
                 >
                     追加
+                </button>
+                <button onClick={clearProductInfo} style={{
+                    padding: "10px 20px",
+                    fontSize: "16px",
+                    color: "white",
+                    backgroundColor: "#FF0000",
+                    border: "none",
+                    borderRadius: "5px",
+                    cursor: "pointer"
+                }}>
+                    削除
                 </button>
             </div>
             
