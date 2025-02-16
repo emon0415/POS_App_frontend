@@ -68,7 +68,11 @@ const ScanCode = () => {
                 throw new Error("取引登録に失敗しました。サーバーからの適切なレスポンスがありません。");
             }
 
-            return transactionData.TRD_ID;
+            // TTL_AMT_EX_TAX を取得
+            const taxExcludedAmount = transactionData.TTL_AMT_EX_TAX;
+            console.log("税抜合計金額:", taxExcludedAmount);
+
+            return { trdId: transactionData.TRD_ID, taxExcludedAmount }; // TRD_IDと税抜価格を返す
         } catch (error) {
             console.error("取引登録エラー:", error);
             throw error;
@@ -110,8 +114,8 @@ const ScanCode = () => {
         }
 
         try {
-            const trdId = await fetchTransaction(totalPrice);
-            alert(`取引登録が完了しました。取引ID: ${trdId}`);
+            const { trdId, taxExcludedAmount } = await fetchTransaction(totalPrice);
+            alert(`取引登録が完了しました。取引ID: ${trdId} (税抜合計金額: ${taxExcludedAmount} 円`);
 
             await fetchTransactionDetails(trdId);
             alert("取引詳細が登録されました");
