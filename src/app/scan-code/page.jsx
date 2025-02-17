@@ -198,18 +198,16 @@ const ScanCode = () => {
         router.push("/new-transaction");
     };
 
-    // 🔹 商品情報がない場合はカメラを起動し、商品情報がある場合はカメラを停止
-    useEffect(() => {
-        if (!productName) {
-            startScanning();
-        } else {
-            stopScanning();
-        }
-    }, [productName]);
 
     // QuaggaJSの初期化と設定
     const startScanning = () => {
         if (isScanning) return; // すでにスキャン中なら何もしない
+
+        const scannerContainer = document.querySelector("#scanner-container");
+        if (!scannerContainer) {
+            console.error("エラー: #scanner-container が見つかりません");
+            return;
+        }
 
         Quagga.init({
             inputStream : {
@@ -217,8 +215,8 @@ const ScanCode = () => {
                 type : "LiveStream",
                 target: document.querySelector('#scanner-container'),    // スキャン表示先
                 constraints: {
-                    width: 640,
-                    height: 480,
+                    width: 400,
+                    height: 200,
                     facingMode: "environment" // 背面カメラを使用
                 }
             },
@@ -270,8 +268,26 @@ const ScanCode = () => {
                 <p>POS機ID: {posNo}</p>
             </div>
 
-            {/* 読み取ったバーコードを表示 */}
-            <div id="scanner-container" style={{ width: '640px', height: '480px', border: "2px solid black" }}></div>
+            {/* スキャン開始・停止ボタン */}
+            <button onClick={isScanning ? stopScanning : startScanning} style={{
+                padding: "10px 20px",
+                fontSize: "16px",
+                cursor: "pointer",
+                backgroundColor: isScanning ? "#FF0000" : "#007BFF",
+                color: "white",
+                border: "none",
+                borderRadius: "5px",
+            }}>
+                {isScanning ? "スキャン停止" : "スキャン開始"}
+            </button>
+
+            {/* カメラ表示エリア,読み取ったバーコードを表示 */}
+            <div id="scanner-container" style={{ 
+                width: '400px',
+                height: '200px', 
+                border: "2px solid black", 
+                display: isScanning ? "block" : "none" 
+            }}></div>
             <p>読み取ったバーコード: {code}</p>
             {error && <p style = {{color: "red" }}>{error}</p>}
 
